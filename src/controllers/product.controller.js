@@ -9,6 +9,21 @@ exports.getAllProducts = async (req, res) => {
     }
 };
 
+exports.getAllProductId = async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const product = await prisma.product.findUnique({ where: {id} });
+
+    if (!product) {
+      return res.status(404).json({ message: "Not Products Found" });
+    }
+    res.json(product);
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server 500" });
+  }
+};
+
+
 exports.createProduct = async (req, res) => {
   try {
     const { name, price, stock } = req.body;
@@ -29,5 +44,24 @@ exports.createProduct = async (req, res) => {
   } catch {
     res.status(500).json({ messge: "Add Oroducts Unsuccess"});
 
+  }
+};
+
+exports.updateProduct = async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const { name, price, stock } = req.body;
+
+    const updated = await prisma.product.update({
+      where: { id },
+      data: {
+        name,
+        price: Number(price),
+        stock: Number(stock)
+      }
+    });
+    res.json(updated);
+  } catch (error) {
+    res.status(404).json({ message: "Products Not Found" });
   }
 };
